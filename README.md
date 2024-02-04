@@ -14,12 +14,43 @@ cd wallet-manager
 ```
 
 
-### Шаг 2: Настройка окружения
-Создайте файл .env в корне проекта и укажите необходимые переменные окружения:
+### Шаг 2: Запуск Docker Compose
 
 ```bash
-DEBUG=True
-SECRET_KEY=your_secret_key
-DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
-DATABASE_URL=postgres://wallet_manager:password@db:5432/wallet_manager
+docker-compose up --build
 ```
+
+Это создаст и запустит контейнеры Docker для приложения и базы данных.
+
+### Шаг 3: Применяем миграции
+
+```bash
+docker-compose run --rm web-app sh -c "python3 manage.py makemigrations"
+docker-compose run --rm web-app sh -c "python3 manage.py migrate"
+```
+
+### Шаг 4: Создаем пользователя
+
+```bash
+docker-compose run --rm web-app sh -c "python3 manage.py createsuperuser"
+```
+
+### Шаг 5: Создаем файл для логов
+
+```bash
+docker-compose run --rm web-app sh -c "touch service/logs/debug.log"
+```
+
+## Проект готов к работе! Создавать транзакции возможно как в Админке пользователя, так и при поиощи API по адресу:
+http://127.0.0.1:8000/api/transactions
+
+## Создавать кошельки так же возможно и в админке и при помощи API по адресу:
+http://127.0.0.1:8000/api/wallets
+
+## Тестирование производится при поиощи команды:
+```bash
+docker-compose run --rm web-app sh -c "python3 manage.py tests"
+```
+## Ограничения:
+1. Нельзя переводить деньги RUB/USD и USD/RUB
+2. Нельзя переводить деньги, которых у вас нет!
